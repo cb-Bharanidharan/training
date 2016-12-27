@@ -1,0 +1,29 @@
+CREATING DB AND TABLES:
+
+DATABASE:
+create database service_station;
+
+SERVICE STATION:
+create table if not exists ServiceStation ( id int primary key, name varchar(30), address varchar(80), contact varchar(10) );
+
+insert into ServiceStation(id,name,address,contact) values(1,"ABC","CHENNAI","1234567890");
+
+EMPLOYEE:
+create table if not exists employee ( id int primary key, name varchar(30), age int, contact varchar(10)); 
+
+CUSTOMER:
+create table if not exists customer( id int primary key, name varchar(30), age int, contact varchar(10),emp_id int,FOREIGN KEY (emp_id) REFERENCES employee(id));
+
+VEHICLE:
+create table if not exists vehicle( id int,type ENUM('Car','Bike','Truck'),brand varchar(10),color varchar(10),service_charge DOUBLE(10,2) );
+
+INVOICE:
+create table if not exists invoice(id int primary key,o_id int REFERENCES customer(id),vech int REFERENCES vehicle(id),amt DOUBLE(10,2),e_id int REFERENCES employee(id));
+
+DROPPING TABLES AND DB:
+
+TABLES:
+drop table invoice,vehicle,customer,employee,ServiceStation;
+
+DB:
+drop database service_station;

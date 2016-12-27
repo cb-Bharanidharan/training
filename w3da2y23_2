@@ -1,0 +1,315 @@
+RESERVATION SYSTEM:
+
+DB CREATION:
+create database RWRSYS;
+
+TABLE CREATION:
+
+TRAINS:
+create table trains ( train_no int(6), train_name varchar(30), primary key(train_no) );
+INSERT INTO trains(train_no,train_name) VALUES(123,"ABC");
+INSERT INTO trains(train_no,train_name) VALUES(345,"BCD");
+INSERT INTO trains(train_no,train_name) VALUES(456,"CDE");
+INSERT INTO trains(train_no,train_name) VALUES(567,"DEF");
+INSERT INTO trains(train_no,train_name) VALUES(678,"EFG");
+INSERT INTO trains(train_no,train_name) VALUES(789,"FGH");
+INSERT INTO trains(train_no,train_name) VALUES(890,"GHI");
+
+
+
+STATIONS:
+create table stations ( station_id int(6), station_code varchar(10), primary key(station_id) );
+
+INSERT INTO stations(station_id,station_code) VALUES(11111,"CHN");
+INSERT INTO stations(station_id,station_code) VALUES(22222,"BGR");
+INSERT INTO stations(station_id,station_code) VALUES(33333,"CBE");
+INSERT INTO stations(station_id,station_code) VALUES(44444,"CAL");
+
+
+
+
+COACHES:
+create table coaches ( CoachCode int(6), costperkm float(5,2), primary key(CoachCode) );
+
+INSERT INTO coaches(CoachCode,costperkm) VALUES(10101,20.5);
+INSERT INTO coaches(CoachCode,costperkm) VALUES(20202,30.5);
+INSERT INTO coaches(CoachCode,costperkm) VALUES(30303,40.5);
+INSERT INTO coaches(CoachCode,costperkm) VALUES(40404,50.5);
+INSERT INTO coaches(CoachCode,costperkm) VALUES(50505,60.5);
+
+USERS:
+create table users (userId int(6), loginId varchar(10), password varchar(30));
+
+INSERT INTO users(userId,loginId,password) VALUES(14001,"abi","somunandu");
+INSERT INTO users(userId,loginId,password) VALUES(14002,"bharani","beval");
+INSERT INTO users(userId,loginId,password) VALUES(14003,"ashi","bala");
+INSERT INTO users(userId,loginId,password) VALUES(14004,"chandhru","chikku");
+INSERT INTO users(userId,loginId,password) VALUES(14005,"aaru","manoj");
+
+ROUTES:
+create table routes (routeId int(6), SourcestationId int(6) REFERENCES stations(station_id), DeststationId int(6) REFERENCES stations(station_id) , distance float(5,2), primary key(routeId)); 
+
+INSERT INTO routes(routeId,SourcestationId,DeststationId,distance) VALUES(11001,11111,22222,350);
+INSERT INTO routes(routeId,SourcestationId,DeststationId,distance) VALUES(11002,11111,33333,450);
+INSERT INTO routes(routeId,SourcestationId,DeststationId,distance) VALUES(11003,11111,44444,650);
+INSERT INTO routes(routeId,SourcestationId,DeststationId,distance) VALUES(11004,33333,22222,750);
+INSERT INTO routes(routeId,SourcestationId,DeststationId,distance) VALUES(11005,44444,22222,150);
+
+
+TRAINROUTEMAPS:
+create table trainroutemaps (routeId int(6) REFERENCES routes(routeId),train_no int(6) REFERENCES trains(train_no),arrival_time TIME,departure_time TIME,DurationinMins int(2), primary key(routeId,train_no) );
+
+INSERT INTO trainroutemaps(routeId,train_no,arrival_time,departure_time,DurationinMins) VALUES(11001,123,"22:40:00","22:50:00",30);
+INSERT INTO trainroutemaps(routeId,train_no,arrival_time,departure_time,DurationinMins) VALUES(11002,890,"12:40:00","15:50:00",50);
+INSERT INTO trainroutemaps(routeId,train_no,arrival_time,departure_time,DurationinMins) VALUES(11003,345,"21:40:00","21:50:00",60);
+INSERT INTO trainroutemaps(routeId,train_no,arrival_time,departure_time,DurationinMins) VALUES(11001,678,"22:10:00","23:50:00",80);
+INSERT INTO trainroutemaps(routeId,train_no,arrival_time,departure_time,DurationinMins) VALUES(11005,456,"22:55:00","23:50:00",90);
+
+BOOKINGS:
+create table bookings (BookingRefNo int(6)  primary key , RouteID int(6) REFERENCES routes(routeId),TrainNo int(6) REFERENCES trains(TrainNo), CoachCode int (6) REFERENCES coaches(CoachCode),DateOfJourney date, DateofBooking date, NoOfTickets int );
+
+INSERT INTO bookings VALUES(98765,11001,123,10101,"2005-3-3","2005-2-2",5);
+INSERT INTO bookings VALUES(87654,11002,345,20202,"2005-3-3","2005-2-2",4);
+INSERT INTO bookings VALUES(76543,11003,678,30303,"2005-3-3","2005-2-2",6);
+INSERT INTO bookings VALUES(65432,11004,789,40404,"2015-2-25","2014-12-24",2);
+INSERT INTO bookings VALUES(54321,11005,890,50505,"2007-1-3","2006-12-2",3);
+
+
+TRAINCOACHES:
+create table trainCoaches (TrainNo int(6) REFERENCES trains(train_no), CoachCode int (6) REFERENCES coaches(CoachCode), NoOfSeats int);
+
+INSERT INTO trainCoaches(TrainNo,CoachCode,NoOfSeats) VALUES(123,10101,60);
+INSERT INTO trainCoaches(TrainNo,CoachCode,NoOfSeats) VALUES(123,20202,50);
+INSERT INTO trainCoaches(TrainNo,CoachCode,NoOfSeats) VALUES(123,30303,40);
+INSERT INTO trainCoaches(TrainNo,CoachCode,NoOfSeats) VALUES(123,40404,30);
+INSERT INTO trainCoaches(TrainNo,CoachCode,NoOfSeats) VALUES(123,50505,20);
+
+
+
+
+
+QUERIES:
+
+1)
+SELECT * FROM trains;
++----------+------------+
+| train_no | train_name |
++----------+------------+
+|      123 | ABC        |
+|      345 | BCD        |
+|      456 | CDE        |
+|      567 | DEF        |
+|      678 | EFG        |
+|      789 | FGH        |
+|      890 | GHI        |
++----------+------------+
+
+2)
+SELECT routeId,S.station_code,D.station_code FROM routes 
+INNER JOIN stations S on routes.Sourcestationid=S.station_id
+INNER JOIN stations D on routes.Deststationid=D.station_id;
++---------+--------------+--------------+
+| routeId | station_code | station_code |
++---------+--------------+--------------+
+|   11001 | CHN          | BGR          |
+|   11002 | CHN          | CBE          |
+|   11003 | CHN          | CAL          |
+|   11004 | CBE          | BGR          |
+|   11005 | CAL          | BGR          |
++---------+--------------+--------------+
+
+3)
+SELECT TrainNo,train_name,sum(noOFSeats) FROM trainCoaches 
+INNER JOIN trains on trains.train_no=trainCoaches.TrainNo
+GROUP BY TrainNo;
++---------+------------+----------------+
+| TrainNo | train_name | sum(noOFSeats) |
++---------+------------+----------------+
+|     123 | ABC        |            200 |
++---------+------------+----------------+
+
+4)
+SELECT routeId,S.station_code,D.station_code FROM routes 
+INNER JOIN stations S on routes.Sourcestationid=S.station_id
+INNER JOIN stations D on routes.Deststationid=D.station_id
+WHERE D.station_code like 'BGR';
++---------+--------------+--------------+
+| routeId | station_code | station_code |
++---------+--------------+--------------+
+|   11001 | CHN          | BGR          |
+|   11004 | CBE          | BGR          |
+|   11005 | CAL          | BGR          |
++---------+--------------+--------------+
+
+5)
+SELECT routeId,S.station_code,D.station_code FROM routes 
+INNER JOIN stations S on routes.Sourcestationid=S.station_id
+INNER JOIN stations D on routes.Deststationid=D.station_id
+WHERE S.station_code like 'BGR' or S.station_code like 'CHN' or S.station_code like 'CAL' ;
++---------+--------------+--------------+
+| routeId | station_code | station_code |
++---------+--------------+--------------+
+|   11001 | CHN          | BGR          |
+|   11002 | CHN          | CBE          |
+|   11003 | CHN          | CAL          |
+|   11005 | CAL          | BGR          |
++---------+--------------+--------------+
+
+6)
+SELECT * FROM bookings
+WHERE DateofBooking BETWEEN '2005-1-1' AND '2005-12-31';
++--------------+---------+---------+-----------+---------------+---------------+-------------+
+| BookingRefNo | RouteID | TrainNo | CoachCode | DateOfJourney | DateofBooking | NoOfTickets |
++--------------+---------+---------+-----------+---------------+---------------+-------------+
+|        76543 |   11003 |     678 |     30303 | 2005-03-03    | 2005-02-02    |           6 |
+|        87654 |   11002 |     345 |     20202 | 2005-03-03    | 2005-02-02    |           4 |
+|        98765 |   11001 |     123 |     10101 | 2005-03-03    | 2005-02-02    |           5 |
++--------------+---------+---------+-----------+---------------+---------------+-------------+
+
+7)
+SELECT * FROM trains where train_name like 'B%';
++----------+------------+
+| train_no | train_name |
++----------+------------+
+|      345 | BCD        |
++----------+------------+
+
+8)
+SELECT * FROM bookings 
+WHERE DateofBooking IS NULL;
+
+9)
+SELECT BookingRefNo,RouteId,train_name,DateOfJourney,DateofBooking FROM bookings
+INNER JOIN trains on trains.train_no=bookings.TrainNo
+WHERE DateofBooking BETWEEN '2006-1-1' AND '2006-12-31'
+AND DateofJourney BETWEEN '2007-1-1' AND '2007-12-31';
++--------------+---------+------------+---------------+---------------+
+| BookingRefNo | RouteId | train_name | DateOfJourney | DateofBooking |
++--------------+---------+------------+---------------+---------------+
+|        54321 |   11005 | GHI        | 2007-01-03    | 2006-12-02    |
++--------------+---------+------------+---------------+---------------+
+
+
+10)
+SELECT TrainNo,train_name,count(noOFSeats)as NoOfCoaches FROM trainCoaches 
+INNER JOIN trains on trains.train_no=trainCoaches.TrainNo
+GROUP BY TrainNo;
++---------+------------+-------------+
+| TrainNo | train_name | NoOfCoaches |
++---------+------------+-------------+
+|     123 | ABC        |           5 |
++---------+------------+-------------+
+
+11)
+SELECT count(*)as TOTAL_BOOKINGS FROM bookings
+INNER JOIN trains on trains.train_no=bookings.TrainNo
+WHERE TrainNo=123;
++----------------+
+| TOTAL_BOOKINGS |
++----------------+
+|              1 |
++----------------+
+
+12)
+SELECT TrainNo,train_name,sum(NoOfTickets)as TOTAL_TICKETS FROM bookings INNER JOIN trains on trains.train_no=bookings.TrainNo WHERE TrainNo=123;
++---------+------------+---------------+
+| TrainNo | train_name | TOTAL_TICKETS |
++---------+------------+---------------+
+|     123 | ABC        |             5 |
++---------+------------+---------------+
+
+13)
+SELECT * FROM routes ORDER BY distance ASC LIMIT 1;
++---------+-----------------+---------------+----------+
+| routeId | SourcestationId | DeststationId | distance |
++---------+-----------------+---------------+----------+
+|   11005 |           44444 |         22222 |   150.00 |
++---------+-----------------+---------------+----------+
+
+14)
+SELECT TrainNo,train_name,sum(NoOfTickets)as TOTAL_TICKETS FROM bookings INNER JOIN trains on trains.train_no=bookings.TrainNo GROUP BY TrainNo;
++---------+------------+---------------+
+| TrainNo | train_name | TOTAL_TICKETS |
++---------+------------+---------------+
+|     123 | ABC        |             5 |
+|     345 | BCD        |             4 |
+|     678 | EFG        |             6 |
+|     789 | FGH        |             2 |
+|     890 | GHI        |             3 |
++---------+------------+---------------+
+
+15)
+SELECT CoachCode,costperkm*50 as COST from coaches;
++-----------+---------+
+| CoachCode | COST    |
++-----------+---------+
+|     10101 | 1025.00 |
+|     20202 | 1525.00 |
+|     30303 | 2025.00 |
+|     40404 | 2525.00 |
+|     50505 | 3025.00 |
++-----------+---------+
+
+16)
+SELECT train_name,departure_time from trainroutemaps 
+INNER JOIN trains on trains.train_no=trainroutemaps.train_no
+WHERE routeId in
+(SELECT routeId FROM routes 
+INNER JOIN stations D on routes.Deststationid=D.station_id
+WHERE D.station_code like 'BGR');
++------------+----------------+
+| train_name | departure_time |
++------------+----------------+
+| ABC        | 22:50:00       |
+| EFG        | 23:50:00       |
+| CDE        | 23:50:00       |
++------------+----------------+
+
+17)
+SELECT TrainNo,train_name,sum(NoOfTickets)as TOTAL_TICKETS FROM bookings INNER JOIN trains on trains.train_no=bookings.TrainNo GROUP BY TrainNo HAVING sum(NoOfTickets)>500;
+
+18)
+SELECT TrainNo,train_name,sum(NoOfTickets)as TOTAL_TICKETS FROM bookings INNER JOIN trains on trains.train_no=bookings.TrainNo GROUP BY TrainNo HAVING sum(NoOfTickets)<50;
++---------+------------+---------------+
+| TrainNo | train_name | TOTAL_TICKETS |
++---------+------------+---------------+
+|     123 | ABC        |             5 |
+|     345 | BCD        |             4 |
+|     678 | EFG        |             6 |
+|     789 | FGH        |             2 |
+|     890 | GHI        |             3 |
++---------+------------+---------------+
+
+19)
+SELECT TrainNo,train_name,CoachCode,S.station_code,D.station_code FROM bookings 
+INNER JOIN trains on trains.train_no=bookings.TrainNo
+INNER JOIN routes R on R.routeId=bookings.RouteId
+INNER JOIN stations D on R.Deststationid=D.station_id
+INNER JOIN stations S on R.Deststationid=S.station_id
+WHERE DateOfJourney >'2014-02-25';
++---------+------------+-----------+--------------+--------------+
+| TrainNo | train_name | CoachCode | station_code | station_code |
++---------+------------+-----------+--------------+--------------+
+|     789 | FGH        |     40404 | BGR          | BGR          |
++---------+------------+-----------+--------------+--------------+
+20)
+SELECT train_name from trainroutemaps 
+INNER JOIN trains on trains.train_no=trainroutemaps.train_no
+WHERE routeId in
+(SELECT routeId FROM routes 
+INNER JOIN stations D on routes.Deststationid=D.station_id
+INNER JOIN stations S on routes.Deststationid=S.station_id
+WHERE D.station_code like 'CHN' 
+AND S.station_code like 'MYS');
+21)
+SELECT DISTINCT(TrainNo),train_name FROM bookings
+INNER JOIN trains on trains.train_no=bookings.TrainNo;
++---------+------------+
+| TrainNo | train_name |
++---------+------------+
+|     890 | GHI        |
+|     789 | FGH        |
+|     678 | EFG        |
+|     345 | BCD        |
+|     123 | ABC        |
++---------+------------+

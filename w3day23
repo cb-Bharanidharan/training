@@ -1,0 +1,461 @@
+CREATING AND IMPORTING DB:
+create training_sample;
+use training_sample;
+source /Users/bharanidharan/Downloads/sample-sql-data.sql
+
+QUERIES FOR STUDENTS:
+1)
+select * from students;
++--------+-------------+
+| id     | name        |
++--------+-------------+
+| 100001 | Thor        |
+| 100002 | Hulk        |
+| 100003 | Daredevil   |
+| 100004 | X Man       |
+| 100005 | Ironman     |
+| 100006 | Quicksilver |
++--------+-------------+
+
+2)
+select * from students where name like 'H%';
++--------+------+
+| id     | name |
++--------+------+
+| 100002 | Hulk |
++--------+------+
+
+3)
+select * from students where name like '%a%';
++--------+-----------+
+| id     | name      |
++--------+-----------+
+| 100003 | Daredevil |
+| 100004 | X Man     |
+| 100005 | Ironman   |
++--------+-----------+
+
+4)
+select * from students order by name asc;
++--------+-------------+
+| id     | name        |
++--------+-------------+
+| 100003 | Daredevil   |
+| 100002 | Hulk        |
+| 100005 | Ironman     |
+| 100006 | Quicksilver |
+| 100001 | Thor        |
+| 100004 | X Man       |
++--------+-------------+
+
+5)
+select * from students order by name asc LIMIT 2;
++--------+-----------+
+| id     | name      |
++--------+-----------+
+| 100003 | Daredevil |
+| 100002 | Hulk      |
++--------+-----------+
+
+6)
+select * from students order by name asc LIMIT 2,2;
++--------+-------------+
+| id     | name        |
++--------+-------------+
+| 100005 | Ironman     |
+| 100006 | Quicksilver |
++--------+-------------+
+
+
+QUERIES FOR USING MARKS:
+
+1)
+SELECT marks.id,student_id,subject_id,quarterly,half_yearly,annual,year,grade FROM students INNER JOIN marks ON students.id=marks.student_id where marks.annual IS NULL;
++------+------------+------------+-----------+-------------+--------+------+-------+
+| id   | student_id | subject_id | quarterly | half_yearly | annual | year | grade |
++------+------------+------------+-----------+-------------+--------+------+-------+
+| 1101 |     100001 |          1 |      NULL |        NULL |   NULL | 2007 |    10 |
++------+------------+------------+-----------+-------------+--------+------+-------+
+
+2)
+SELECT student_id,subject_id,year FROM students INNER JOIN marks ON students.id=marks.student_id where annual IS NULL and year=2005;
+
+3)
+SELECT student_id,subject_id,year FROM students INNER JOIN marks ON students.id=marks.student_id
+    ->  where 
+    ->  (annual IS NOT NULL and half_yearly IS NULL and  quarterly IS NULL)
+    ->  or (annual IS  NULL and half_yearly IS NOT NULL and  quarterly IS NULL)
+    ->  or (annual IS  NULL and half_yearly IS NULL and  quarterly IS NOT NULL);
++------------+------------+------+
+| student_id | subject_id | year |
++------------+------------+------+
+|     100001 |          4 | 2003 |
+|     100001 |          3 | 2006 |
++------------+------------+------+
+
+4)
+SELECT student_id,subject_id,year,quarterly,half_yearly,annual FROM students INNER JOIN marks ON students.id=marks.student_id where half_yearly>90 and quarterly>90 and annual>90;
++------------+------------+------+-----------+-------------+--------+
+| student_id | subject_id | year | quarterly | half_yearly | annual |
++------------+------------+------+-----------+-------------+--------+
+|     100003 |          1 | 2003 |       100 |          97 |     95 |
+|     100003 |          2 | 2003 |        93 |          91 |     98 |
+|     100003 |          4 | 2003 |        91 |          95 |     99 |
+|     100003 |          2 | 2006 |       100 |          99 |     95 |
++------------+------------+------+-----------+-------------+--------+
+
+5)
+SELECT student_id,subject_id,(IFNULL(quarterly, 0) + IFNULL(half_yearly, 0) + IFNULL(annual, 0))/3 as average,year FROM students INNER JOIN marks ON students.id=marks.student_id ;
++------------+------------+---------+------+
+| student_id | subject_id | average | year |
++------------+------------+---------+------+
+|     100001 |          1 | 56.6667 | 2003 |
+|     100001 |          2 | 35.3333 | 2003 |
+|     100001 |          3 | 58.3333 | 2003 |
+|     100001 |          4 | 26.6667 | 2003 |
+|     100001 |          5 | 39.6667 | 2003 |
+|     100001 |          1 | 50.0000 | 2004 |
+|     100001 |          2 | 43.0000 | 2004 |
+|     100001 |          3 | 62.6667 | 2004 |
+|     100001 |          4 | 55.0000 | 2004 |
+|     100001 |          5 | 69.0000 | 2004 |
+|     100001 |          1 | 82.3333 | 2005 |
+|     100001 |          2 | 65.0000 | 2005 |
+|     100001 |          3 | 53.3333 | 2005 |
+|     100001 |          4 | 73.3333 | 2005 |
+|     100001 |          5 | 80.6667 | 2005 |
+|     100001 |          1 | 67.3333 | 2006 |
+|     100001 |          2 | 74.0000 | 2006 |
+|     100001 |          3 | 10.6667 | 2006 |
+|     100001 |          4 | 72.3333 | 2006 |
+|     100001 |          5 | 76.6667 | 2006 |
+|     100001 |          1 |  0.0000 | 2007 |
+|     100001 |          2 | 59.3333 | 2007 |
+|     100001 |          3 | 78.3333 | 2007 |
+|     100001 |          4 | 68.6667 | 2007 |
+|     100001 |          5 | 62.0000 | 2007 |
+|     100002 |          1 | 53.6667 | 2003 |
+|     100002 |          2 | 56.3333 | 2003 |
+|     100002 |          3 | 56.6667 | 2003 |
+|     100002 |          4 | 42.0000 | 2003 |
+|     100002 |          5 | 43.3333 | 2003 |
+|     100002 |          1 | 59.3333 | 2004 |
+|     100002 |          2 | 90.0000 | 2004 |
+|     100002 |          3 | 58.6667 | 2004 |
+|     100002 |          4 | 74.0000 | 2004 |
+|     100002 |          5 | 77.3333 | 2004 |
+|     100002 |          1 | 53.0000 | 2005 |
+|     100002 |          2 | 60.6667 | 2005 |
+|     100002 |          3 | 52.0000 | 2005 |
+|     100002 |          4 | 65.0000 | 2005 |
+|     100002 |          5 | 68.3333 | 2005 |
+|     100002 |          1 | 59.0000 | 2006 |
+|     100002 |          2 | 63.3333 | 2006 |
+|     100002 |          3 | 54.3333 | 2006 |
+|     100002 |          4 | 55.6667 | 2006 |
+|     100002 |          5 | 46.0000 | 2006 |
+|     100002 |          1 | 67.6667 | 2007 |
+|     100002 |          2 | 56.6667 | 2007 |
+|     100002 |          3 | 68.6667 | 2007 |
+|     100002 |          4 | 81.0000 | 2007 |
+|     100002 |          5 | 60.0000 | 2007 |
+|     100003 |          1 | 97.3333 | 2003 |
+|     100003 |          2 | 94.0000 | 2003 |
+|     100003 |          3 | 43.0000 | 2003 |
+|     100003 |          4 | 95.0000 | 2003 |
+|     100003 |          5 | 93.3333 | 2003 |
+|     100003 |          1 | 74.6667 | 2004 |
+|     100003 |          2 | 68.0000 | 2004 |
+|     100003 |          3 | 52.6667 | 2004 |
+|     100003 |          4 | 62.0000 | 2004 |
+|     100003 |          5 | 61.6667 | 2004 |
+|     100003 |          1 | 72.0000 | 2005 |
+|     100003 |          2 | 51.3333 | 2005 |
+|     100003 |          3 | 69.6667 | 2005 |
+|     100003 |          4 | 71.3333 | 2005 |
+|     100003 |          5 | 58.3333 | 2005 |
+|     100003 |          1 | 72.0000 | 2006 |
+|     100003 |          2 | 98.0000 | 2006 |
+|     100003 |          3 | 61.3333 | 2006 |
+|     100003 |          4 | 74.0000 | 2006 |
+|     100003 |          5 | 80.3333 | 2006 |
+|     100003 |          1 | 80.6667 | 2007 |
+|     100003 |          2 | 91.0000 | 2007 |
+|     100003 |          3 | 63.0000 | 2007 |
+|     100003 |          4 | 69.3333 | 2007 |
+|     100003 |          5 | 54.0000 | 2007 |
+|     100004 |          1 | 47.0000 | 2003 |
+|     100004 |          2 | 71.6667 | 2003 |
+|     100004 |          3 | 58.6667 | 2003 |
+|     100004 |          4 | 53.6667 | 2003 |
+|     100004 |          5 | 59.3333 | 2003 |
+|     100004 |          1 | 66.6667 | 2004 |
+|     100004 |          2 | 77.6667 | 2004 |
+|     100004 |          3 | 61.6667 | 2004 |
+|     100004 |          4 | 65.0000 | 2004 |
+|     100004 |          5 | 72.3333 | 2004 |
+|     100004 |          1 | 77.0000 | 2005 |
+|     100004 |          2 | 53.0000 | 2005 |
+|     100004 |          3 | 90.0000 | 2005 |
+|     100004 |          4 | 44.6667 | 2005 |
+|     100004 |          5 | 72.6667 | 2005 |
+|     100004 |          1 | 80.6667 | 2006 |
+|     100004 |          2 | 59.0000 | 2006 |
+|     100004 |          3 | 74.6667 | 2006 |
+|     100004 |          4 | 66.0000 | 2006 |
+|     100004 |          5 | 60.6667 | 2006 |
+|     100004 |          1 | 46.3333 | 2007 |
+|     100004 |          2 | 57.3333 | 2007 |
+|     100004 |          3 | 50.0000 | 2007 |
+|     100004 |          4 | 85.6667 | 2007 |
+|     100004 |          5 | 53.3333 | 2007 |
+|     100005 |          1 | 71.0000 | 2003 |
+|     100005 |          2 | 56.0000 | 2003 |
+|     100005 |          3 | 41.3333 | 2003 |
+|     100005 |          4 | 71.6667 | 2003 |
+|     100005 |          5 | 54.6667 | 2003 |
+|     100005 |          1 | 67.0000 | 2004 |
+|     100005 |          2 | 54.3333 | 2004 |
+|     100005 |          3 | 63.3333 | 2004 |
+|     100005 |          4 | 61.3333 | 2004 |
+|     100005 |          5 | 39.6667 | 2004 |
+|     100005 |          1 | 61.3333 | 2005 |
+|     100005 |          2 | 56.3333 | 2005 |
+|     100005 |          3 | 68.3333 | 2005 |
+|     100005 |          4 | 65.0000 | 2005 |
+|     100005 |          5 | 58.0000 | 2005 |
+|     100005 |          1 | 70.0000 | 2006 |
+|     100005 |          2 | 63.6667 | 2006 |
+|     100005 |          3 | 70.0000 | 2006 |
+|     100005 |          4 | 80.3333 | 2006 |
+|     100005 |          5 | 81.0000 | 2006 |
+|     100005 |          1 | 78.0000 | 2007 |
+|     100005 |          2 | 85.6667 | 2007 |
+|     100005 |          3 | 71.3333 | 2007 |
+|     100005 |          4 | 61.6667 | 2007 |
+|     100005 |          5 | 93.0000 | 2007 |
++------------+------------+---------+------+
+6)
+SELECT student_id,subject_id,(IFNULL(quarterly, 0) + IFNULL(half_yearly, 0) + IFNULL(annual, 0))/3 as average,year FROM students INNER JOIN marks ON students.id=marks.student_id where year=2003 or year=2004 GROUP BY subject_id,student_id,year;
++------------+------------+---------+------+
+| student_id | subject_id | average | year |
++------------+------------+---------+------+
+|     100001 |          1 | 56.6667 | 2003 |
+|     100001 |          1 | 50.0000 | 2004 |
+|     100002 |          1 | 53.6667 | 2003 |
+|     100002 |          1 | 59.3333 | 2004 |
+|     100003 |          1 | 97.3333 | 2003 |
+|     100003 |          1 | 74.6667 | 2004 |
+|     100004 |          1 | 47.0000 | 2003 |
+|     100004 |          1 | 66.6667 | 2004 |
+|     100005 |          1 | 71.0000 | 2003 |
+|     100005 |          1 | 67.0000 | 2004 |
+|     100001 |          2 | 35.3333 | 2003 |
+|     100001 |          2 | 43.0000 | 2004 |
+|     100002 |          2 | 56.3333 | 2003 |
+|     100002 |          2 | 90.0000 | 2004 |
+|     100003 |          2 | 94.0000 | 2003 |
+|     100003 |          2 | 68.0000 | 2004 |
+|     100004 |          2 | 71.6667 | 2003 |
+|     100004 |          2 | 77.6667 | 2004 |
+|     100005 |          2 | 56.0000 | 2003 |
+|     100005 |          2 | 54.3333 | 2004 |
+|     100001 |          3 | 58.3333 | 2003 |
+|     100001 |          3 | 62.6667 | 2004 |
+|     100002 |          3 | 56.6667 | 2003 |
+|     100002 |          3 | 58.6667 | 2004 |
+|     100003 |          3 | 43.0000 | 2003 |
+|     100003 |          3 | 52.6667 | 2004 |
+|     100004 |          3 | 58.6667 | 2003 |
+|     100004 |          3 | 61.6667 | 2004 |
+|     100005 |          3 | 41.3333 | 2003 |
+|     100005 |          3 | 63.3333 | 2004 |
+|     100001 |          4 | 26.6667 | 2003 |
+|     100001 |          4 | 55.0000 | 2004 |
+|     100002 |          4 | 42.0000 | 2003 |
+|     100002 |          4 | 74.0000 | 2004 |
+|     100003 |          4 | 95.0000 | 2003 |
+|     100003 |          4 | 62.0000 | 2004 |
+|     100004 |          4 | 53.6667 | 2003 |
+|     100004 |          4 | 65.0000 | 2004 |
+|     100005 |          4 | 71.6667 | 2003 |
+|     100005 |          4 | 61.3333 | 2004 |
+|     100001 |          5 | 39.6667 | 2003 |
+|     100001 |          5 | 69.0000 | 2004 |
+|     100002 |          5 | 43.3333 | 2003 |
+|     100002 |          5 | 77.3333 | 2004 |
+|     100003 |          5 | 93.3333 | 2003 |
+|     100003 |          5 | 61.6667 | 2004 |
+|     100004 |          5 | 59.3333 | 2003 |
+|     100004 |          5 | 72.3333 | 2004 |
+|     100005 |          5 | 54.6667 | 2003 |
+|     100005 |          5 | 39.6667 | 2004 |
++------------+------------+---------+------+
+
+
+JOINED QUERIES:
+1)
+SELECT name FROM students INNER JOIN marks ON students.id=marks.student_id where annual IS NULL and quarterly IS NULL and half_yearly IS NULL;
++------+
+| name |
++------+
+| Thor |
++------+
+
+2)
+SELECT name,sum(IFNULL(annual,0))as marks,year FROM students INNER JOIN marks ON students.id=marks.student_id GROUP BY name,year;
++-----------+-------+------+
+| name      | marks | year |
++-----------+-------+------+
+| Daredevil |   465 | 2003 |
+| Daredevil |   319 | 2004 |
+| Daredevil |   385 | 2005 |
+| Daredevil |   318 | 2006 |
+| Daredevil |   306 | 2007 |
+| Hulk      |   296 | 2003 |
+| Hulk      |   463 | 2004 |
+| Hulk      |   295 | 2005 |
+| Hulk      |   218 | 2006 |
+| Hulk      |   429 | 2007 |
+| Ironman   |   323 | 2003 |
+| Ironman   |   287 | 2004 |
+| Ironman   |   287 | 2005 |
+| Ironman   |   320 | 2006 |
+| Ironman   |   412 | 2007 |
+| Thor      |   424 | 2003 |
+| Thor      |   309 | 2004 |
+| Thor      |   375 | 2005 |
+| Thor      |   296 | 2006 |
+| Thor      |   212 | 2007 |
+| X Man     |   261 | 2003 |
+| X Man     |   307 | 2004 |
+| X Man     |   312 | 2005 |
+| X Man     |   287 | 2006 |
+| X Man     |   354 | 2007 |
++-----------+-------+------+
+3)
+SELECT name,sum(IFNULL(quarterly,0))as marks,grade FROM students INNER JOIN marks ON students.id=marks.student_id WHERE year=2003 GROUP BY name;
++-----------+-------+-------+
+| name      | marks | grade |
++-----------+-------+-------+
+| Daredevil |   428 |     6 |
+| Hulk      |   203 |     6 |
+| Ironman   |   277 |     6 |
+| Thor      |     0 |     6 |
+| X Man     |   300 |     6 |
++-----------+-------+-------+
+
+4)
+SELECT name,grade,count(medal_won) as medals FROM students INNER JOIN medals on students.id=medals.student_id WHERE grade=9 or grade=10  GROUP BY name,grade HAVING count(medal_won)>3;
+
+5)
+SELECT name,count(medal_won) as medals FROM students LEFT OUTER JOIN medals on students.id=medals.student_id GROUP BY students.id HAVING count(medal_won)<2;
++-------------+--------+
+| name        | medals |
++-------------+--------+
+| X Man       |      0 |
+| Ironman     |      0 |
+| Quicksilver |      0 |
++-------------+--------+
+
+6)
+SELECT name,annual,count(subject_id),marks.year
+FROM 
+students LEFT JOIN medals on students.id=medals.student_id
+INNER JOIN marks on students.id=marks.student_id 
+WHERE annual>90 
+GROUP BY name,marks.year
+HAVING count(medal_won)=0 and count(subject_id)=5;
+
+7)
+SELECT name,game_id,medal_won,year,grade FROM students  INNER JOIN medals on students.id=medals.student_id where students.id in (select student_id from medals group by student_id having count(*)>3);
++-----------+---------+-----------+------+-------+
+| name      | game_id | medal_won | year | grade |
++-----------+---------+-----------+------+-------+
+| Daredevil |       5 | gold      | 2003 |     6 |
+| Thor      |       5 | silver    | 2003 |     6 |
+| Hulk      |       4 | silver    | 2003 |     6 |
+| Daredevil |       1 | gold      | 2003 |     6 |
+| Daredevil |       3 | bronze    | 2004 |     7 |
+| Daredevil |       4 | silver    | 2004 |     7 |
+| Hulk      |       2 | silver    | 2004 |     7 |
+| Hulk      |       4 | bronze    | 2004 |     7 |
+| Hulk      |       5 | gold      | 2004 |     7 |
+| Daredevil |       3 | bronze    | 2005 |     8 |
+| Thor      |       2 | gold      | 2005 |     8 |
+| Thor      |       3 | bronze    | 2005 |     8 |
+| Thor      |       4 | bronze    | 2005 |     8 |
++-----------+---------+-----------+------+-------+
+
+8)
+SELECT t1.name,t1.medals,t2.quarterly,t2.half,t2.annual,t1.year,t2.grade
+FROM 
+    (SELECT name,count(medal_won) as medals, medals.year FROM students INNER JOIN medals on students.id=medals.student_id 
+GROUP BY name,medals.year) t1
+INNER join
+    (SELECT name,sum(IFNULL(quarterly,0))/5 as quarterly,sum(IFNULL(half_yearly,0))/5 as half,sum(IFNULL(annual,0))/5 as annual,year,grade FROM students INNER JOIN marks ON students.id=marks.student_id GROUP BY name,year) t2
+on
+    t1.name = t2.name and t1.year=t2.year;
++-----------+--------+-----------+---------+---------+------+-------+
+| name      | medals | quarterly | half    | annual  | year | grade |
++-----------+--------+-----------+---------+---------+------+-------+
+| Daredevil |      2 |   85.6000 | 75.0000 | 93.0000 | 2003 |     6 |
+| Daredevil |      2 |   64.8000 | 62.8000 | 63.8000 | 2004 |     7 |
+| Daredevil |      1 |   66.8000 | 49.8000 | 77.0000 | 2005 |     8 |
+| Hulk      |      1 |   40.6000 | 51.4000 | 59.2000 | 2003 |     6 |
+| Hulk      |      3 |   64.8000 | 58.2000 | 92.6000 | 2004 |     7 |
+| Thor      |      1 |    0.0000 | 45.2000 | 84.8000 | 2003 |     6 |
+| Thor      |      3 |   66.8000 | 71.0000 | 75.0000 | 2005 |     8 |
++-----------+--------+-----------+---------+---------+------+-------+
+
+9)
+DELIMITER $$
+CREATE FUNCTION rating(val double) RETURNS VARCHAR(1) DETERMINISTIC BEGIN DECLARE R VARCHAR(1);
+  IF val>90 THEN SET R='S';
+  ELSEIF val>80 THEN SET R='A';
+  ELSEIF val>70 THEN SET R='B';
+  ELSEIF val>60 THEN SET R='C';
+  ELSEIF val>50 THEN SET R='D';
+  ELSEIF val>40 THEN SET R='E';
+  ELSE
+  SET R='E';
+  END IF;
+  RETURN(R);
+ END 	
+
+
+SELECT name,
+rating(sum(IFNULL(quarterly,0))/5) QRATING,
+rating(sum(IFNULL(half_yearly,0))/5) HRATING,
+rating(sum(IFNULL(annual,0))/5) ARATING,year,grade
+FROM students INNER JOIN marks ON students.id=marks.student_id GROUP BY name,year;
+
++-----------+---------+---------+---------+------+-------+
+| name      | QRATING | HRATING | ARATING | year | grade |
++-----------+---------+---------+---------+------+-------+
+| Daredevil | A       | B       | S       | 2003 |     6 |
+| Daredevil | C       | C       | C       | 2004 |     7 |
+| Daredevil | C       | E       | B       | 2005 |     8 |
+| Daredevil | A       | A       | C       | 2006 |     9 |
+| Daredevil | B       | B       | C       | 2007 |    10 |
+| Hulk      | E       | D       | D       | 2003 |     6 |
+| Hulk      | C       | D       | S       | 2004 |     7 |
+| Hulk      | C       | D       | D       | 2005 |     8 |
+| Hulk      | B       | E       | E       | 2006 |     9 |
+| Hulk      | C       | D       | A       | 2007 |    10 |
+| Ironman   | D       | D       | C       | 2003 |     6 |
+| Ironman   | D       | D       | D       | 2004 |     7 |
+| Ironman   | D       | B       | D       | 2005 |     8 |
+| Ironman   | A       | C       | C       | 2006 |     9 |
+| Ironman   | B       | B       | A       | 2007 |    10 |
+| Thor      | E       | E       | A       | 2003 |     6 |
+| Thor      | E       | D       | C       | 2004 |     7 |
+| Thor      | C       | B       | B       | 2005 |     8 |
+| Thor      | D       | C       | D       | 2006 |     9 |
+| Thor      | C       | D       | E       | 2007 |    10 |
+| X Man     | D       | C       | D       | 2003 |     6 |
+| X Man     | B       | C       | C       | 2004 |     7 |
+| X Man     | B       | C       | C       | 2005 |     8 |
+| X Man     | B       | B       | D       | 2006 |     9 |
+| X Man     | D       | E       | B       | 2007 |    10 |
++-----------+---------+---------+---------+------+-------+
